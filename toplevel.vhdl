@@ -95,13 +95,13 @@ begin
     x0_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 1.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => X0);
     x1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 0.5, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => X1);
 
-    pwm_l_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency =>  500.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => LEFT);
-    pwm_r_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 1000.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => RIGHT);
+    pwm_l_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 200.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => LEFT);
+    pwm_r_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 400.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => RIGHT);
 
     PWM_L <= LEFT  and (not X1) and X0;
     PWM_R <= RIGHT and (    X1) and X0;
 
-    -- Put an identifying frequency on each of the PMOD outputs.
+    -- Put an identifying frequency on each of the PMOD outputs (you can verify with a scope).
 
     pmod1_p1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 11.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p1);
     pmod1_p2_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 12.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p2);
@@ -149,21 +149,21 @@ begin
 
     seven_segment_counter_instance : entity work.seven_segment_counter
         port map (
-            CLK             => CLK_PL,
-            PORT_RESET      => RESET,
+            CLK          => CLK_PL,
+            PORT_RESET   => RESET,
             --
-            PORT_D3         => D3,
-            PORT_D2         => D2,
-            PORT_D1         => D1,
-            PORT_D0         => D0,
-            PORT_D3_EN      => D3_EN,
-            PORT_D2_EN      => D2_EN,
-            PORT_D1_EN      => D1_EN,
-            PORT_D0_EN      => D0_EN,
-            PORT_D3_LDOT    => D3_LDOT,
-            PORT_D2_LDOT    => D2_LDOT,
-            PORT_D1_LDOT    => D1_LDOT,
-            PORT_D0_LDOT    => D0_LDOT
+            PORT_D3      => D3,
+            PORT_D2      => D2,
+            PORT_D1      => D1,
+            PORT_D0      => D0,
+            PORT_D3_EN   => D3_EN,
+            PORT_D2_EN   => D2_EN,
+            PORT_D1_EN   => D1_EN,
+            PORT_D0_EN   => D0_EN,
+            PORT_D3_LDOT => D3_LDOT,
+            PORT_D2_LDOT => D2_LDOT,
+            PORT_D1_LDOT => D1_LDOT,
+            PORT_D0_LDOT => D0_LDOT
         );
 
     vga_driver : entity work.vga
