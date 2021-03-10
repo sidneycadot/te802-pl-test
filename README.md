@@ -5,17 +5,17 @@ Basic Trenz TE802 test for all FPGA-accessible peripherals
 This small demo shows how to access the following peripherals on the Trenz TE802 development board:
 
 signal                            | in design
---------------------------------- | --------------------------------------
-5 user buttons                    | shown on the LEDs.
-8 user switches                   | shown on the LEDs (invert the signal).
-2 config switches                 | shown on the LED.
-1 JACKSNS                         | shows presence or absence of a headphone on LED.
-Left PMOD                         | drives 11 .. 18 kHz on the 8 PMOD pins.
-Right PMOD                        | drives 21 .. 28 kHz on the 8 PMOD pins.
-VGA                               | drives 1920x1080 test image on VGA (out of spec, but modern monitors will display it).
-Seven-segment display             | shows timer on the display with 0.1 second resolution.
-Headphone                         | alternately drives 500 Hz on the left, and 1000 Hz on the right channel.
-Clock generator reset             | driven with 0.
+--------------------------------- | -------------------------------------------------------------------------------------
+5 user buttons                    | shown on LED 7 .. 3
+2 config switches                 | shown on LED 2 .. 1
+1 JACKSNS                         | shown on LED 0
+8 user switches                   | shown on LED 7 .. 0 (inverts value)
+Left PMOD                         | drives 11 .. 18 kHz on the 8 PMOD pins
+Right PMOD                        | drives 21 .. 28 kHz on the 8 PMOD pins
+VGA                               | drives 1920x1080 test image on VGA (out of spec, but modern monitors will display it)
+Seven-segment display             | shows timer on the display with 0.1 second resolution
+Headphone                         | alternately drives 500 Hz on the left and 1000 Hz on the right channel
+Clock generator reset             | driven with 0
 
 The table below shows the LED display (LED7 on the left, LED0 on the right):
 
