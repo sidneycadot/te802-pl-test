@@ -51,9 +51,9 @@ CLK_GEN_RESET        |            out               | drives the RESETN/SYNC inp
 How to get this working
 -----------------------
 
-1. Start Vivado and select "Create new project".
+1. Start Vivado and select "Create Project".
 
-2. Enter a project name, for example "te802-test"
+2. Enter a project name, for example "te802-test".
 
 3. Select "RTL project". Deselect "Do not specify sources at this time", because we want to do just that.
 
