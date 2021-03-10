@@ -87,7 +87,7 @@ How to get this working
     If you don't hear different signals on your left and right ears, play around with the jack for a bit —
     I found it works best if it's not jammed in fully.
 
-    After this multi-media experience, press some buttons or move some switches to experience the visceral pleasure
-    of lighting up LEDs.
+    After this immersive multi-media experience, press some buttons or move some switches to experience the visceral
+    pleasure of lighting up LEDs.
 
 With this design as a starting point, the world of FPGAs is yours to conquer!
