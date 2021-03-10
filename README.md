@@ -6,10 +6,10 @@ This small demo shows how to access the following peripherals on the Trenz TE802
 
 signal                            | in design
 --------------------------------- | -------------------------------------------------------------------------------------
-5 user buttons                    | shown on LED 7 .. 3
-2 config switches                 | shown on LED 2 .. 1
+5 user buttons                    | shown on LEDs 7 .. 3
+2 config switches                 | shown on LEDs 2 .. 1
 1 JACKSNS                         | shown on LED 0
-8 user switches                   | shown on LED 7 .. 0 (inverts value)
+8 user switches                   | shown on LEDs 7 .. 0 (inverts value)
 Left PMOD                         | drives 11 .. 18 kHz on the 8 PMOD pins
 Right PMOD                        | drives 21 .. 28 kHz on the 8 PMOD pins
 VGA                               | drives 1920x1080 test image on VGA (out of spec, but modern monitors will display it)
@@ -17,7 +17,7 @@ Seven-segment display             | shows timer on the display with 0.1 second r
 Headphone                         | alternately drives 500 Hz on the left and 1000 Hz on the right channel
 Clock generator reset             | driven with 0
 
-The table below shows the LED display (LED7 on the left, LED0 on the right):
+The table below shows the LEDs as used by the demo:
 
 LED7 | LED6 | LED5  | LED4 | LED3   | LED2 | LED1 | LED0
 ---- | ---- | ----  | ---- | ------ | ---- | ---- | ----------------
@@ -28,12 +28,12 @@ The eight user switches, when in their "up" position, invert the corresponding L
 Signals reachable from the FPGA
 -------------------------------
 
-Some devices on the board (Ethernet, USB, ...) connect directly to the processor inside the Zynq.
+Some devices on the board (Ethernet, USB, ...) connect directly to the processor (PS) side of the Zynq.
 
-Only the following signals can be read or driven from the PL (FPGA) side of the Zynq:
+Only the following signals can be read or driven from the FPGA (PL) side of the Zynq:
 
 signal               | direction (rel to FPGA) | signal meaning
--------------------- | ----------------------- | -------------------------------------------------------------
+-------------------- | ----------------------- | ---------------------------------------------------------------------
 USER_BTN_*           |            in           | 0=pushed, 1=not pushed
 USER_SW_*            |            in           | 0=down (towards edge of PCB), 1=up (towards center of PCB)
 USER_CFG_SW_{3,4}    |            in           | 0=left (towards center of PCB), 1=right (towards edge of PCB)
@@ -44,4 +44,4 @@ VGA_HSYNC, VGA_VSYNC |            out          | 1 drives the SYNC signal high, 
 SEG_C                |            out          | 0=segment off (dark), 1=segment on (red)
 SEG_ANODE            |            out          | 0=digit on (red), 1=digit off (dark)
 PWM_L, PWM_R         |            out          | drive headphone output (left channel and right channel)
-CLK_GEN_RESET        |            out          | drives the RESETN/SYNC input of the CDCI6214RGET chip
+CLK_GEN_RESET        |            out          | drives the RESETN/SYNC input of the CDCI6214RGET clock generator chip
