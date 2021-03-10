@@ -123,7 +123,7 @@ set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS18} [get_ports PWM_L]
 set_property -dict {PACKAGE_PIN F4 IOSTANDARD LVCMOS18} [get_ports PWM_R]
 
 # Headset jack inserted detection (0==detected, 1==not detected).
-set_property -dict {PACKAGE_PIN F3 IOSTANDARD LVCMOS18} [get_ports JACKSNS]
+set_property -dict {PACKAGE_PIN F3 IOSTANDARD LVCMOS18} [get_ports JACK_SENSE]
 
 # Define the 25 MHz CLK_PL clock.
 create_clock -period 40.0 -name CLK_PL_clock -add [get_ports CLK_PL]

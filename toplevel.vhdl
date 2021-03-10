@@ -45,10 +45,9 @@ entity toplevel is
         SEG_C  : out std_logic_vector(7 downto 0);
         SEG_AN : out std_logic_vector(4 downto 0);
         --
-        JACKSNS : in std_logic;
-        --
-        PWM_L : out std_logic;
-        PWM_R : out std_logic;
+        JACK_SENSE : in  std_logic;
+        PWM_L      : out std_logic;
+        PWM_R      : out std_logic;
         --
         CLK_GEN_RESET : out std_logic
     );
@@ -82,22 +81,22 @@ begin
             DST_SYNC  => RESET
         );
 
-    LED <= ((not USER_BTN_DOWN) & (not USER_BTN_UP) & (not USER_BTN_RIGHT) & (not USER_BTN_LEFT) & (not USER_BTN_CENTER) & USER_CFG_SW_3 & USER_CFG_SW_4 & (not JACKSNS)) xor (not USER_SW);
+    LED <= ((not USER_BTN_DOWN) & (not USER_BTN_UP) & (not USER_BTN_RIGHT) & (not USER_BTN_LEFT) & (not USER_BTN_CENTER) & USER_CFG_SW_3 & USER_CFG_SW_4 & (not JACK_SENSE)) xor (not USER_SW);
 
     -- Alternately put 55 Hz on the left channel, 1760 Hz on the right channel.
     --
     --
     -- x1 x0
     --  0  0     silence
-    --  0  1     left
+    --  0  1     left (500 Hz)
     --  1  0     silence
-    --  1  1     right
+    --  1  1     right (1000 Hz)
 
     x0_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 1.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => X0);
     x1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 0.5, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => X1);
 
-    pwm_l_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency =>   55.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => LEFT);
-    pwm_r_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 1760.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => RIGHT);
+    pwm_l_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency =>  500.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => LEFT);
+    pwm_r_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 1000.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => RIGHT);
 
     PWM_L <= LEFT  and (not X1) and X0;
     PWM_R <= RIGHT and (    X1) and X0;
