@@ -5,14 +5,14 @@ Basic Trenz TE802 test for all FPGA-accessible peripherals
 This small demo shows how to access the following peripherals on the Trenz TE802 development board:
 
 signal                            | in design
---------------------------------- | -------------------------------------------------------------------------------------
+--------------------------------- | --------------------------------------------------------------------------------
 5 user buttons                    | shown on LEDs 7 .. 3
 2 config switches                 | shown on LEDs 2 .. 1
 1 JACKSNS                         | shown on LED 0
-8 user switches                   | shown on LEDs 7 .. 0 (inverts value)
+8 user switches                   | shown on LEDs 7 .. 0 ; slide "up" to invert LED
 Left PMOD                         | drives 11 .. 18 kHz on the 8 PMOD pins
 Right PMOD                        | drives 21 .. 28 kHz on the 8 PMOD pins
-VGA                               | drives 1920x1080 test image on VGA (out of spec, but modern monitors will display it)
+VGA                               | shows 1920x1080 test image on VGA output, provided your monitor or TV handles it
 Seven-segment display             | shows timer on the display with 0.1 second resolution
 Headphone                         | alternately drives 500 Hz on the left and 1000 Hz on the right channel
 Clock generator reset             | driven with 0
