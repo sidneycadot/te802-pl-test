@@ -6,8 +6,8 @@ use xpm.vcomponents.all;
 
 entity synchronizer is
     port (
-        SRC_ASYNC : in std_logic;
-        DST_CLK   : in std_logic;
+        SRC_ASYNC : in  std_logic;
+        DST_CLK   : in  std_logic;
         DST_SYNC  : out std_logic
     );
 end entity synchronizer;

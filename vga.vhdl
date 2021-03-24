@@ -43,15 +43,11 @@ constant reset_state : StateType := (
         vga_hsync => '0'
     );
 
-type CombinatorialSignals is
-    record
+type CombinatorialSignals is record
         next_state : StateType;
     end record CombinatorialSignals;
 
-function UpdateCombinatorialSignals(
-            current_state : in StateType;
-            RESET         : in std_logic
-         ) return CombinatorialSignals is
+function UpdateCombinatorialSignals(current_state : in StateType; RESET : in std_logic) return CombinatorialSignals is
 
     type SyncPolarity is (NegativePolarity, PositivePolarity);
 
@@ -70,8 +66,8 @@ function UpdateCombinatorialSignals(
 
     -- H_SYNC_WIDTH is followed by H_BACK_PORCH is followed by H_PIXELS is followed by H_FRONT_PORCH.
     -- V_SYNC_WIDTH is followed by V_BACK_PORCH is followed by V_PIXELS is followed by V_FRONT_PORCH.
-    constant H_TOTAL       : natural := H_SYNC_WIDTH + H_BACK_PORCH + H_PIXELS + H_FRONT_PORCH;
-    constant V_TOTAL       : natural := V_SYNC_WIDTH + V_BACK_PORCH + V_PIXELS + V_FRONT_PORCH;
+    constant H_TOTAL : natural := H_SYNC_WIDTH + H_BACK_PORCH + H_PIXELS + H_FRONT_PORCH;
+    constant V_TOTAL : natural := V_SYNC_WIDTH + V_BACK_PORCH + V_PIXELS + V_FRONT_PORCH;
 
     variable combinatorial : CombinatorialSignals;
 
@@ -92,7 +88,6 @@ begin
         combinatorial.next_state.vga_r := x"0";
         combinatorial.next_state.vga_g := x"0";
         combinatorial.next_state.vga_b := x"0";
-
 
         if V_SYNC_WIDTH + V_BACK_PORCH <= combinatorial.next_state.y and combinatorial.next_state.y < V_SYNC_WIDTH + V_BACK_PORCH + V_PIXELS then
 
@@ -153,7 +148,6 @@ end function UpdateCombinatorialSignals;
 
 signal combinatorial : CombinatorialSignals;
 signal current_state : StateType := reset_state;
-signal next_state : StateType;
 
 begin
 

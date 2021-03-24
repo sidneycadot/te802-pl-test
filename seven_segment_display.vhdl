@@ -33,7 +33,6 @@ architecture arch of seven_segment_display is
 
 type AnodeStatus is (Digit0, Digit1, Digit2, Digit3, AuxDots);
 
---32767 is fine
 type CounterType is range 0 to 1023;
 
 type StateType is record
@@ -50,8 +49,7 @@ constant reset_state : StateType := (
         seg_c        => "00000000" -- all off
     );
 
-type CombinatorialSignals is
-    record
+type CombinatorialSignals is record
         next_state : StateType;
     end record CombinatorialSignals;
 
@@ -150,7 +148,6 @@ end function UpdateCombinatorialSignals;
 
 signal combinatorial : CombinatorialSignals;
 signal current_state : StateType := reset_state;
-signal next_state : StateType;
 
 begin
 

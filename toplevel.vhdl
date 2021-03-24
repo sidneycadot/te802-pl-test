@@ -55,8 +55,13 @@ end entity toplevel;
 
 architecture arch of toplevel is
 
-signal CLK_VGA : std_logic;
-signal RESET : std_logic;
+signal CLK_VGA   : std_logic;
+signal RESET_VGA : std_logic;
+
+signal CLK_MAIN   : std_logic;
+signal RESET_MAIN : std_logic;
+
+constant CLK_MAIN_FREQ : real := 25.0e6;
 
 -- Signals for connecting the seven-segment display to the seven-segment counter.
 signal D3, D2, D1, D0 : std_logic_vector(3 downto 0);
@@ -71,14 +76,22 @@ begin
     clocksynth_instance : entity work.clocksynth
         port map (
             CLK_25MHz => CLK_PL,
+            CLK_MAIN  => CLK_MAIN,
             CLK_VGA   => CLK_VGA
         );
 
-    sync_reset : entity work.synchronizer
+    sync_reset_main : entity work.synchronizer
         port map(
             SRC_ASYNC => not USER_BTN_CENTER,
-            DST_CLK   => CLK_PL,
-            DST_SYNC  => RESET
+            DST_CLK   => CLK_MAIN,
+            DST_SYNC  => RESET_MAIN
+        );
+
+    sync_reset_vga : entity work.synchronizer
+        port map(
+            SRC_ASYNC => not USER_BTN_CENTER,
+            DST_CLK   => CLK_VGA,
+            DST_SYNC  => RESET_VGA
         );
 
     LED <= ((not USER_BTN_DOWN) & (not USER_BTN_UP) & (not USER_BTN_RIGHT) & (not USER_BTN_LEFT) & (not USER_BTN_CENTER) & USER_CFG_SW_3 & USER_CFG_SW_4 & (not JACK_SENSE)) xor (not USER_SW);
@@ -92,40 +105,39 @@ begin
     --  1  0     silence
     --  1  1     right (1000 Hz)
 
-    x0_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 1.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => X0);
-    x1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 0.5, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => X1);
+    x0_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 1.0, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => X0);
+    x1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 0.5, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => X1);
 
-    pwm_l_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 200.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => LEFT);
-    pwm_r_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 400.0, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => RIGHT);
+    pwm_l_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 200.0, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => LEFT);
+    pwm_r_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 400.0, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => RIGHT);
 
     PWM_L <= LEFT  and (not X1) and X0;
     PWM_R <= RIGHT and (    X1) and X0;
 
     -- Put an identifying frequency on each of the PMOD outputs (you can verify with a scope).
 
-    pmod1_p1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 11.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p1);
-    pmod1_p2_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 12.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p2);
-    pmod1_p3_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 13.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p3);
-    pmod1_p4_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 14.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p4);
-    pmod1_p7_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 15.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p7);
-    pmod1_p8_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 16.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p8);
-    pmod1_p9_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 17.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p9);
-    pmod1_p10_fm : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 18.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD1_p10);
+    pmod1_p1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 11.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p1);
+    pmod1_p2_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 12.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p2);
+    pmod1_p3_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 13.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p3);
+    pmod1_p4_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 14.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p4);
+    pmod1_p7_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 15.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p7);
+    pmod1_p8_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 16.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p8);
+    pmod1_p9_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 17.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p9);
+    pmod1_p10_fm : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 18.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p10);
 
-    pmod2_p1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 21.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p1);
-    pmod2_p2_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 22.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p2);
-    pmod2_p3_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 23.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p3);
-    pmod2_p4_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 24.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p4);
-    pmod2_p7_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 25.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p7);
-    pmod2_p8_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 26.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p8);
-    pmod2_p9_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 27.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p9);
-    pmod2_p10_fm : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => 25.0e6, target_frequency => 28.0e3, duty_cycle => 50.0) port map(CLK => CLK_PL, RESET => '0', OUTPUT => PMOD2_p10);
+    pmod2_p1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 21.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p1);
+    pmod2_p2_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 22.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p2);
+    pmod2_p3_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 23.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p3);
+    pmod2_p4_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 24.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p4);
+    pmod2_p7_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 25.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p7);
+    pmod2_p8_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 26.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p8);
+    pmod2_p9_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 27.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p9);
+    pmod2_p10_fm : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 28.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD2_p10);
 
     seven_segment_display_driver : entity work.seven_segment_display
         port map (
-            CLK    => CLK_PL,
-            --
-            PORT_RESET      => RESET,
+            CLK             => CLK_MAIN,
+            PORT_RESET      => RESET_MAIN,
             --
             PORT_D3         => D3,
             PORT_D2         => D2,
@@ -149,8 +161,8 @@ begin
 
     seven_segment_counter_instance : entity work.seven_segment_counter
         port map (
-            CLK          => CLK_PL,
-            PORT_RESET   => RESET,
+            CLK          => CLK_MAIN,
+            PORT_RESET   => RESET_MAIN,
             --
             PORT_D3      => D3,
             PORT_D2      => D2,
@@ -169,7 +181,7 @@ begin
     vga_driver : entity work.vga
         port map (
             CLK            => CLK_VGA,
-            PORT_RESET     => RESET,
+            PORT_RESET     => RESET_VGA,
             PORT_VGA_R     => VGA_R,
             PORT_VGA_G     => VGA_G,
             PORT_VGA_B     => VGA_B,

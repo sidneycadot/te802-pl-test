@@ -11,9 +11,9 @@ entity frequency_maker is
         duty_cycle       : in real  -- unit: percent (0 .. 100)
     );
     port (
-        CLK    : in  std_logic;
-        RESET  : in  std_logic; -- Synchronous reset request, synchronous to CLK.
-        OUTPUT : out std_logic  -- Registered output, synchronous to CLK.
+        CLK         : in  std_logic;
+        PORT_RESET  : in  std_logic; -- Synchronous reset request, synchronous to CLK.
+        PORT_OUTPUT : out std_logic  -- Registered output, synchronous to CLK.
     );
 end entity frequency_maker;
 
@@ -50,40 +50,51 @@ constant reset_state : StateType := (
         output  => '0'
     );
 
-signal current_state : StateType := reset_state;
-signal next_state    : StateType;
-
-procedure update_combinatorial_signals(signal next_state: out StateType) is
+type CombinatorialSignals is record
+        next_state : StateType;
+     end record CombinatorialSignals;
+ 
+function UpdateCombinatorialSignals(current_state: in StateType; RESET: in std_logic) return CombinatorialSignals is
 
 constant delta               : UnsignedCounterType := real_to_unsigned(2.0 ** num_counter_bits * target_frequency / clk_frequency);
 constant duty_cycle_boundary : UnsignedCounterType := real_to_unsigned(2.0 ** num_counter_bits * duty_cycle / 100.0);
 
-variable state: StateType := current_state; -- 'state' starts as a copy of the current state.
+variable combinatorial : CombinatorialSignals;
 
-begin -- of procedure  update_combinatorial_signals.
+begin
 
-    -- Handle regular state update.
-    state.counter := state.counter + delta;
+    if RESET = '1' then
 
-    -- Set output register in accordance with main state.
-    state.output := '1' when (state.counter < duty_cycle_boundary) else '0';
+        combinatorial.next_state := reset_state;
 
-    -- Handle synchronous reset. This overrides any and all state updates made before.
-    state := reset_state when RESET;
+    else
+    
+        combinatorial.next_state := current_state;
 
-    next_state <= state;
+        -- Handle regular state update.
+        combinatorial.next_state.counter := combinatorial.next_state.counter + delta;
 
-end procedure update_combinatorial_signals;
+        -- Set output register in accordance with main state.
+        combinatorial.next_state.output := '1' when (combinatorial.next_state.counter < duty_cycle_boundary) else '0';
+
+    end if;
+
+    return combinatorial;
+
+end function UpdateCombinatorialSignals;
+
+signal current_state : StateType := reset_state;
+signal combinatorial : CombinatorialSignals;
 
 begin -- of architecture body.
 
     -- Update combinatorial signals continuously.
-    update_combinatorial_signals(next_state);
+    combinatorial <= UpdateCombinatorialSignals(current_state, PORT_RESET);
 
     -- Perform the state update at each clock cycle.
-    current_state <= next_state when rising_edge(CLK);
+    current_state <= combinatorial.next_state when rising_edge(CLK);
 
     -- Replicate outputs from state register holding the current state.
-    OUTPUT <= current_state.output;
+    PORT_OUTPUT <= current_state.output;
 
 end architecture arch;

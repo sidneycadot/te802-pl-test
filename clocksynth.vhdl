@@ -7,6 +7,7 @@ use unisim.vcomponents.all;
 entity clocksynth is
     port (
         CLK_25MHz : in  std_logic;
+        CLK_MAIN  : out std_logic;
         CLK_VGA   : out std_logic
     );
 end entity clocksynth;
@@ -17,6 +18,8 @@ architecture arch of clocksynth is
 signal MMCM_feedback_clock : std_logic;
 
 begin
+
+    CLK_MAIN <= CLK_25MHz;
 
     MMCME4_BASE_instance : MMCME4_BASE
     generic map (

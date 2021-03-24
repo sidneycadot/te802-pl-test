@@ -26,7 +26,6 @@ end entity seven_segment_counter;
 
 architecture arch of seven_segment_counter is
 
---32767 is fine
 type CounterType is range 0 to 2499999;
 
 type StateType is record
@@ -61,20 +60,15 @@ constant reset_state : StateType := (
         d0_ldot => '0'
     );
 
-type CombinatorialSignals is
-    record
+type CombinatorialSignals is record
         next_state : StateType;
     end record CombinatorialSignals;
 
-function UpdateCombinatorialSignals(
-            current_state : in StateType;
-            RESET         : in std_logic
-         ) return CombinatorialSignals is
+function UpdateCombinatorialSignals(current_state : in StateType; RESET : in std_logic) return CombinatorialSignals is
 
 variable combinatorial : CombinatorialSignals;
 
 begin
-
 
     if RESET = '1' then
         combinatorial.next_state := reset_state;
@@ -110,7 +104,7 @@ begin
 
         combinatorial.next_state.d0_en := '1';
         combinatorial.next_state.d1_en := '1';
-        --if combinatorial.next_state.d3 /= "0000" or combinatorial.next_state.d2 /= "0000" or combinatorial.next_state.d1 /= "0000" then combinatorial.next_state.d1_en := '1'; else combinatorial.next_state.d1_en := '0'; end if;
+     -- if combinatorial.next_state.d3 /= "0000" or combinatorial.next_state.d2 /= "0000" or combinatorial.next_state.d1 /= "0000" then combinatorial.next_state.d1_en := '1'; else combinatorial.next_state.d1_en := '0'; end if;
         if combinatorial.next_state.d3 /= "0000" or combinatorial.next_state.d2 /= "0000"                                          then combinatorial.next_state.d2_en := '1'; else combinatorial.next_state.d2_en := '0'; end if;
         if combinatorial.next_state.d3 /= "0000"                                                                                   then combinatorial.next_state.d3_en := '1'; else combinatorial.next_state.d3_en := '0'; end if;
 
@@ -122,14 +116,10 @@ end function UpdateCombinatorialSignals;
 
 signal combinatorial : CombinatorialSignals;
 signal current_state : StateType := reset_state;
-signal next_state : StateType;
 
 begin
 
-    combinatorial <= UpdateCombinatorialSignals(
-            current_state,
-            PORT_RESET
-        );
+    combinatorial <= UpdateCombinatorialSignals(current_state, PORT_RESET);
 
     current_state <= combinatorial.next_state when rising_edge(CLK);
     
