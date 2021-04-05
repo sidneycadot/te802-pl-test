@@ -1,5 +1,5 @@
 
--- Basic test design for the Trenz TE802 board.
+-- Basic test design for the Trenz TE-802 development board.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -55,13 +55,13 @@ end entity toplevel;
 
 architecture arch of toplevel is
 
-signal CLK_VGA   : std_logic;
-signal RESET_VGA : std_logic;
+signal CLK_VGA    : std_logic;
+signal RESET_VGA  : std_logic;
 
 signal CLK_MAIN   : std_logic;
 signal RESET_MAIN : std_logic;
 
-constant CLK_MAIN_FREQ : real := 25.0e6;
+constant CLK_MAIN_FREQ : real := 200.0e6;
 
 -- Signals for connecting the seven-segment display to the seven-segment counter.
 signal D3, D2, D1, D0 : std_logic_vector(3 downto 0);
@@ -96,14 +96,14 @@ begin
 
     LED <= ((not USER_BTN_DOWN) & (not USER_BTN_UP) & (not USER_BTN_RIGHT) & (not USER_BTN_LEFT) & (not USER_BTN_CENTER) & USER_CFG_SW_3 & USER_CFG_SW_4 & (not JACK_SENSE)) xor (not USER_SW);
 
-    -- Alternately put 55 Hz on the left channel, 1760 Hz on the right channel.
+    -- Alternately put 200 Hz on the left channel, 400 Hz on the right channel.
     --
     --
     -- x1 x0
     --  0  0     silence
-    --  0  1     left (500 Hz)
+    --  0  1     left (200 Hz)
     --  1  0     silence
-    --  1  1     right (1000 Hz)
+    --  1  1     right (400 Hz)
 
     x0_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 1.0, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => X0);
     x1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 0.5, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => X1);
@@ -114,7 +114,7 @@ begin
     PWM_L <= LEFT  and (not X1) and X0;
     PWM_R <= RIGHT and (    X1) and X0;
 
-    -- Put an identifying frequency on each of the PMOD outputs (you can verify with a scope).
+    -- Put an identifying frequency on each of the PMOD outputs (you can verify these with a scope).
 
     pmod1_p1_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 11.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p1);
     pmod1_p2_fm  : entity work.frequency_maker generic map (num_counter_bits => 32, clk_frequency => CLK_MAIN_FREQ, target_frequency => 12.0e3, duty_cycle => 50.0) port map(CLK => CLK_MAIN, PORT_RESET => RESET_MAIN, PORT_OUTPUT => PMOD1_p2);
