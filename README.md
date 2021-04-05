@@ -62,8 +62,8 @@ How to get this working
 
 5. When you get to "Add Constraints", add "constraints.xdc".
 
-6. At "Default Part", select the "xczu2cg-sbva484-1-e". It may be convenient to set some filters to find to part:
-   Family to "Zynq UltraScale+ MPSoCs", Package to "sbva484", Speed to "-1", and Temperature to "E".
+6. At "Default Part", select the "xczu2cg-sbva484-1-e". It may be convenient to set some filters to find the part:
+   set Family to "Zynq UltraScale+ MPSoCs", Package to "sbva484", Speed to "-1", and Temperature to "E".
 
 7. Vivado now creates and opens the project. Unfortunately, all files now have type "VHDL" where they should be
    "VHDL 2008", because we use some newer syntax.
